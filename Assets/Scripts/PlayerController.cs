@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Inputs")]
+    public KeyCode leftKey, rightkey, jumpKey, attackKey;
+
     public float speed = 3;
     public float jumpSpeed = 3;
 
@@ -30,7 +33,7 @@ public class PlayerController : MonoBehaviour
     private float hight = 0.9f;
 
     //Attack
-    public Transform attackPoint;
+    public Transform attackPointL, attackPointR;
     public float attackRange = 0.5f;
     public LayerMask enemyLayer;
     public float hammerProjection = 3;
@@ -38,7 +41,8 @@ public class PlayerController : MonoBehaviour
     private bool attackDirection = false;
     public float attackRate = 2f;
     float nextAttackTime = 0f;
-    public float stunTime = 5f;    
+    public float stunTime = 5f;
+    private float stunTimeActu = 0;
 
 
     void Start()
@@ -50,15 +54,16 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        //TODO : Hammer + Git
-        //Detail: Enlever le transfer de force entre player lors d'une colision
-        //TUTO : https://www.youtube.com/watch?v=44djqUTg2Sg (deplacement)
-        //       https://www.youtube.com/watch?v=sPiVz1k-fEs (hammer)
+        //TODO : Stun
+        //Error : Projection plus effective après un premier mouvement
 
-        if (playerID == 0 && Time.time >= stunTime)
+        if (Time.time >= stunTimeActu)
         {
+            //reset var
+            stunTimeActu = 0;
+
             //Gauche + Droite
-            if ((Input.GetKey("q") || Input.GetKey("left")) && (!isGrippingLeft || jumpState == JumpState.Grounded))
+            if (Input.GetKey(leftKey) && (!isGrippingLeft || jumpState == JumpState.Grounded))
             {
                 rb.velocity = new Vector2(-speed, rb.velocity.y);
 
@@ -67,7 +72,7 @@ public class PlayerController : MonoBehaviour
                 //spriteRenderer.flipX = true;
                 attackDirection = true;
             }
-            else if ((Input.GetKey("d") || Input.GetKey("right")) && (!isGrippingRight || jumpState == JumpState.Grounded))
+            else if (Input.GetKey(rightkey) && (!isGrippingRight || jumpState == JumpState.Grounded))
             {
                 rb.velocity = new Vector2(speed, rb.velocity.y);
 
@@ -90,7 +95,7 @@ public class PlayerController : MonoBehaviour
             }
 
             //Saut
-            if ((Input.GetKey("z") || Input.GetKey("up")) && jumpState == JumpState.Grounded)
+            if (Input.GetKey(jumpKey) && jumpState == JumpState.Grounded)
             {
                 //Debug.Log("Jump");
                 rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
@@ -119,7 +124,8 @@ public class PlayerController : MonoBehaviour
             }
 
             //Attaque droite et gauche
-            if (Input.GetKey("space") && Time.time >= nextAttackTime)
+            //Gauche
+            if (attackDirection && Input.GetKey(attackKey) && Time.time >= nextAttackTime)
             {
                 //reset timeAttack
                 nextAttackTime = Time.time + 1f / attackRate;
@@ -127,38 +133,50 @@ public class PlayerController : MonoBehaviour
                 //Animation / Attack hitbox Apparition (pour test)
 
                 //Detection des player dans la zone
-                Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
+                Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPointL.position, attackRange, enemyLayer);
+                //Collider2D[] hitEnemiesL = Physics2D.OverlapCircleAll(attackPointR.position, -attackRange, enemyLayer);
 
                 //On leur applique une velocité (effet de l'attaque)
                 foreach (Collider2D enemy in hitEnemies)
                 {
                     //Appliquer une velocité
                     //Attention: check la direction pour coord x
-                    //enemy.velocity = new Vector2( (+/-) hammerProjection, 0);
-                    if (attackDirection)
-                    {
-                        //direction = gauche
-                        //enemy.velocity = new Vector2((hammerProjection, 0);
-                        enemy.GetComponent<PlayerController>().applyAttack(-hammerProjection, 0);
-                        Debug.Log("Attaque à gauche");
-                    }
-                    else
-                    {
-                        //        |
-                        //TODO : \/
-                        //direction = droite
-                        enemy.GetComponent<PlayerController>().applyAttack(hammerProjection, 0);
-                        Debug.Log("Attaque à droite");
-                    }
+                    
+                    //direction = gauche
+                    //enemy.velocity = new Vector2((hammerProjection, 0);
+                    enemy.GetComponent<PlayerController>().applyAttack(-hammerProjection, 0);
+                    Debug.Log("Attaque à Gauche");
+                    
+                    Debug.Log("Enemy hit");
+                }
+            }
+
+            if (!attackDirection && Input.GetKey(attackKey) && Time.time >= nextAttackTime)
+            {
+                //reset timeAttack
+                nextAttackTime = Time.time + 1f / attackRate;
+
+                //Animation / Attack hitbox Apparition (pour test)
+
+                //Detection des player dans la zone
+                Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPointR.position, attackRange, enemyLayer);
+                //Collider2D[] hitEnemiesL = Physics2D.OverlapCircleAll(attackPointR.position, -attackRange, enemyLayer);
+
+                //On leur applique une velocité (effet de l'attaque)
+                foreach (Collider2D enemy in hitEnemies)
+                {
+                    //Appliquer une velocité
+                    //Attention: check la direction pour coord x
+
+                    //direction = gauche
+                    //enemy.velocity = new Vector2((hammerProjection, 0);
+                    enemy.GetComponent<PlayerController>().applyAttack(hammerProjection, 0);
+                    Debug.Log("Attaque à Droite");
 
                     Debug.Log("Enemy hit");
                 }
-
             }
-        }
-
-        
-
+        }               
     }
 
     void applyAttack(float velocityX, float velocityY)
@@ -166,18 +184,14 @@ public class PlayerController : MonoBehaviour
         //Velocité
         rb.velocity = new Vector2(velocityX, velocityY);
         //Stun
-
+        stunTimeActu = stunTime;
     }
 
     void OnDrawGizmosSelected()
     {
-        if(attackPoint != null)
-        {
-            Gizmos.DrawWireSphere(attackPoint.position, attackRange);
-        }
+        Gizmos.DrawWireSphere(attackPointR.position, attackRange);
+        Gizmos.DrawWireSphere(attackPointL.position, attackRange);
     }
-
-
 
     void OnCollisionStay2D(Collision2D col)
     {
