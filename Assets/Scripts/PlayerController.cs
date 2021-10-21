@@ -39,15 +39,17 @@ public class PlayerController : MonoBehaviour
     public Transform attackPointL, attackPointR;
     public GameObject hammerPointL, hammerPointR;
     public float attackRange = 0.5f;
-    public float hammerHitboxRange = 1f;
+    public float hammerHitboxRange = 0.75f;
     public LayerMask enemyLayer, hammerHitboxLayer;
     public float hammerProjection = 3;
+    public float hammerBlockProjection = 1.5f;
         //false = droite; true = gauche
     private bool attackDirection = false;
     public float attackRate = 2f;
     public float attackDuration = 0.1f;
     private float attackDurationActu;
     private bool isAttackRunningL, isAttackRunningR;
+    private bool didAttackedBlockedL, didAttackedBlockedR;
     float nextAttackTime = 0f;
     public float stunTime = 0.5f;
     private float stunTimeActu;
@@ -64,6 +66,8 @@ public class PlayerController : MonoBehaviour
         attackDurationActu = 0;
         isAttackRunningL = false;
         isAttackRunningR = false;
+        didAttackedBlockedL = false;
+        didAttackedBlockedR = false;
 
         //deactivate hammerHitBox
         hammerPointL.SetActive(false);
@@ -169,82 +173,110 @@ public class PlayerController : MonoBehaviour
 
             //Attaque droite et gauche
             //Gauche
-            
-            if (attackDirection && Input.GetKey(attackKey) && Time.time >= nextAttackTime)
-            {
-                isAttackRunningL = true;
-                attackDurationActu = attackDuration + Time.time;
-
-                //apparition hammerHitBox
-                hammerPointL.SetActive(true);
-            }
-
-            
-            if (isAttackRunningL && Time.time >= attackDurationActu)
+            //1) debut attaque
+            if (Input.GetKeyDown(attackKey) && attackDirection && Time.time >= nextAttackTime)
             {
                 //reset timeAttack
                 nextAttackTime = Time.time + 1f / attackRate;
 
-                //Animation / Attack hitbox Apparition (pour test)
+                isAttackRunningL = true;
+                attackDurationActu = attackDuration + Time.time;
+                Debug.Log("Attaque gauche");
 
+                //apparition hammerHitBox
+                hammerPointL.SetActive(true);
+            }
+            //2)animation attaque + verif block
+            if (isAttackRunningL && Time.time < attackDurationActu)
+            {
                 //Detection d'un blocage
                 Collider2D[] hammers = Physics2D.OverlapCircleAll(hammerPointL.transform.position, hammerHitboxRange, hammerHitboxLayer);
+
                 if (hammers.Length > 1)
                 {
                     //on contre
-                    Debug.Log("Blocage à gauche");
+                    Debug.Log("Blocage à Gauche");
 
+                    didAttackedBlockedL = true;
+                    /*
+                    isAttackRunningL = false;
+                    hammerPointL.SetActive(false);
+                    */
                 }
-                else
-                {
-                    //Detection des player dans la zone
-                    Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPointL.position, attackRange, enemyLayer);
+                
+            }
+            //3) applyAttack
+            if (isAttackRunningL && Time.time >= attackDurationActu)
+            {
+                Debug.Log("Attaque gauche3");
+                //Animation / Attack hitbox Apparition (pour test)
 
+                //Detection des player dans la zone
+                Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPointL.position, attackRange, enemyLayer);
+
+                if (!didAttackedBlockedL)
+                {
                     //On leur applique une velocité (effet de l'attaque)
                     foreach (Collider2D enemy in hitEnemies)
                     {
                         //Appliquer une velocité
                         //Attention: check la direction pour coord x
                         enemy.GetComponent<PlayerController>().applyAttack(-hammerProjection, 0);
-                        //Debug.Log("Attaque à Gauche");
-                        //Debug.Log("Enemy hit");
                     }
                 }
+                else
+                {
+                    // apply self blockProjection
+                    applyAttack(hammerBlockProjection, 0);
+                }
+                //reset var
+                didAttackedBlockedL = false;
                 isAttackRunningL = false;
                 //disparition hammerHitBox
                 hammerPointL.SetActive(false);
+                
             }
 
 
             //Droite
-            if (!attackDirection && Input.GetKey(attackKey) && Time.time >= nextAttackTime)
-            {
-                isAttackRunningR = true;
-                attackDurationActu = attackDuration + Time.time;
-
-                //apparition hammerHitBox
-                hammerPointR.SetActive(true);
-            }
-
-            if (isAttackRunningR && Time.time >= attackDurationActu)
+            //1) debut attaque
+            if (Input.GetKeyDown(attackKey) && !attackDirection && Time.time >= nextAttackTime)
             {
                 //reset timeAttack
                 nextAttackTime = Time.time + 1f / attackRate;
 
-                //Animation / Attack hitbox Apparition (pour test)
-
+                isAttackRunningR = true;
+                attackDurationActu = attackDuration + Time.time;
+                Debug.Log("Attaque droite");
+                //apparition hammerHitBox
+                hammerPointR.SetActive(true);
+            }
+            //2) animation attaque + verif block
+            if (isAttackRunningR && Time.time < attackDurationActu)
+            {
                 //Detection d'un blocage
                 Collider2D[] hammers = Physics2D.OverlapCircleAll(hammerPointR.transform.position, hammerHitboxRange, hammerHitboxLayer);
                 if (hammers.Length > 1)
                 {
                     //on contre
                     Debug.Log("Blocage à Droite");
+                    didAttackedBlockedR = true;
                 }
-                else
-                {
-                    //Detection des player dans la zone
-                    Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPointR.position, attackRange, enemyLayer);
+            }
+            //3) applyAttack
+            if (isAttackRunningR && Time.time >= attackDurationActu)
+            {
+                Debug.Log("Attaque droite3");
+                //reset timeAttack
+                nextAttackTime = Time.time + 1f / attackRate;
 
+                //Animation / Attack hitbox Apparition (pour test)
+
+                //Detection des player dans la zone
+                Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPointR.position, attackRange, enemyLayer);
+
+                if (!didAttackedBlockedR)
+                {
                     //On leur applique une velocité (effet de l'attaque)
                     foreach (Collider2D enemy in hitEnemies)
                     {
@@ -255,83 +287,17 @@ public class PlayerController : MonoBehaviour
                         //Debug.Log("Enemy hit");
                     }
                 }
+                else
+                {
+                    // apply self blockProjection
+                    applyAttack(-hammerBlockProjection, 0);
+                }
+                //reset var
+                didAttackedBlockedR = false;
                 isAttackRunningR = false;
                 //disparition hammerHitBox
                 hammerPointR.SetActive(false);
             }
-            
-
-            /*
-            //Gauche
-            if (attackDirection && Input.GetKey(attackKey) && Time.time >= nextAttackTime)
-            {
-                Debug.Log("OUI1G");
-                isAttackRunningL = true;
-                attackDurationActu = attackDuration + Time.time;
-            }
-
-            if (isAttackRunningL && Time.time >= attackDurationActu)
-            {
-                //reset timeAttack
-                nextAttackTime = Time.time + 1f / attackRate;
-
-                //Animation / Attack hitbox Apparition (pour test)
-
-                //Detection des player dans la zone
-                Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPointL.position, attackRange, enemyLayer);
-
-                //On leur applique une velocité (effet de l'attaque)
-                bool _isBlocked = false;
-                foreach (Collider2D enemy in hitEnemies)
-                {
-                    //Appliquer une velocité
-                    //Attention: check la direction pour coord x
-                    enemy.GetComponent<PlayerController>().applyAttack(-hammerProjection, 0);
-                    if (enemy.GetComponent<PlayerController>().isAttackRunningR() == true) _isBlocked = true;
-                    Debug.Log("Attaque à Gauche");
-
-                    Debug.Log("Enemy hit");
-                }
-
-                //fin attaque
-                isAttackRunningL = false;
-            }
-
-            //Droite
-            if (attackDirection && Input.GetKey(attackKey) && Time.time >= nextAttackTime)
-            {
-                Debug.Log("OUI1G");
-                isAttackRunningL = true;
-                attackDurationActu = attackDuration + Time.time;
-            }
-
-            if (isAttackRunningR && Time.time >= attackDurationActu)
-            {
-                //reset timeAttack
-                nextAttackTime = Time.time + 1f / attackRate;
-
-                //Animation / Attack hitbox Apparition (pour test)
-
-                //Detection des player dans la zone
-                Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPointR.position, attackRange, enemyLayer);
-
-                //On leur applique une velocité (effet de l'attaque)
-                foreach (Collider2D enemy in hitEnemies)
-                {
-                    //Appliquer une velocité
-                    //Attention: check la direction pour coord x
-                    enemy.GetComponent<PlayerController>().applyAttack(hammerProjection, 0);
-                    Debug.Log("Attaque à Droite");
-
-                    Debug.Log("Enemy hit");
-                }
-                
-            //fin attaque
-            isAttackRunningR = false;
-            }
-            */
-            
-                        
         }
     }
 
