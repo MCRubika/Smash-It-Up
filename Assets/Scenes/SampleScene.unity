@@ -234,7 +234,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: stunTime
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: attackKey
@@ -291,14 +291,18 @@ PrefabInstance:
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: hammerPointL
       value: 
-      objectReference: {fileID: 625031421}
+      objectReference: {fileID: 625031420}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: hammerPointR
       value: 
-      objectReference: {fileID: 1514225894}
+      objectReference: {fileID: 1514225893}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: wallJumpSpeed
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
+      propertyPath: attackDuration
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: enemyLayer.m_Bits
@@ -307,6 +311,10 @@ PrefabInstance:
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: wallJumpMovementFreeze
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
+      propertyPath: hammerHitboxLayer.m_Bits
+      value: 512
       objectReference: {fileID: 0}
     - target: {fileID: 5644938382581787734, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: m_Name
@@ -817,7 +825,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: stunTime
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: attackKey
@@ -874,14 +882,18 @@ PrefabInstance:
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: hammerPointL
       value: 
-      objectReference: {fileID: 709334054}
+      objectReference: {fileID: 709334053}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: hammerPointR
       value: 
-      objectReference: {fileID: 2031345516}
+      objectReference: {fileID: 2031345515}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: wallJumpSpeed
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
+      propertyPath: attackDuration
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: enemyLayer.m_Bits
@@ -890,6 +902,10 @@ PrefabInstance:
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: wallJumpMovementFreeze
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
+      propertyPath: hammerHitboxLayer.m_Bits
+      value: 512
       objectReference: {fileID: 0}
     - target: {fileID: 5644938382581787734, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: m_Name

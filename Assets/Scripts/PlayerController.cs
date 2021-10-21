@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
 
     //Attack
     public Transform attackPointL, attackPointR;
-    public Transform hammerPointL, hammerPointR;
+    public GameObject hammerPointL, hammerPointR;
     public float attackRange = 0.5f;
     public float hammerHitboxRange = 1f;
     public LayerMask enemyLayer, hammerHitboxLayer;
@@ -45,11 +45,11 @@ public class PlayerController : MonoBehaviour
         //false = droite; true = gauche
     private bool attackDirection = false;
     public float attackRate = 2f;
-    public float attackDuration = 1f;
+    public float attackDuration = 0.1f;
     private float attackDurationActu;
     private bool isAttackRunningL, isAttackRunningR;
     float nextAttackTime = 0f;
-    public float stunTime = 1f;
+    public float stunTime = 0.5f;
     private float stunTimeActu;
 
 
@@ -64,12 +64,15 @@ public class PlayerController : MonoBehaviour
         attackDurationActu = 0;
         isAttackRunningL = false;
         isAttackRunningR = false;
+
+        //deactivate hammerHitBox
+        hammerPointL.SetActive(false);
+        hammerPointR.SetActive(false);
     }
 
     private void Update()
     {
-        //TODO : 
-        //Error : jump physics
+        //TODO : blocage (hammerHibox)
 
         //stun also equal to immortality
         if (Time.time >= stunTimeActu)
@@ -169,26 +172,28 @@ public class PlayerController : MonoBehaviour
             
             if (attackDirection && Input.GetKey(attackKey) && Time.time >= nextAttackTime)
             {
-                Debug.Log("OUI1G");
                 isAttackRunningL = true;
                 attackDurationActu = attackDuration + Time.time;
+
+                //apparition hammerHitBox
+                hammerPointL.SetActive(true);
             }
 
             
             if (isAttackRunningL && Time.time >= attackDurationActu)
             {
-                Debug.Log("OUI2G");
                 //reset timeAttack
                 nextAttackTime = Time.time + 1f / attackRate;
 
                 //Animation / Attack hitbox Apparition (pour test)
 
                 //Detection d'un blocage
-                Collider2D[] hammers = Physics2D.OverlapCircleAll(hammerPointL.position, hammerHitboxRange, hammerHitboxLayer);
-                if (hammers.Length > 0)
+                Collider2D[] hammers = Physics2D.OverlapCircleAll(hammerPointL.transform.position, hammerHitboxRange, hammerHitboxLayer);
+                if (hammers.Length > 1)
                 {
                     //on contre
                     Debug.Log("Blocage à gauche");
+
                 }
                 else
                 {
@@ -201,34 +206,36 @@ public class PlayerController : MonoBehaviour
                         //Appliquer une velocité
                         //Attention: check la direction pour coord x
                         enemy.GetComponent<PlayerController>().applyAttack(-hammerProjection, 0);
-                        Debug.Log("Attaque à Gauche");
-
-                        Debug.Log("Enemy hit");
+                        //Debug.Log("Attaque à Gauche");
+                        //Debug.Log("Enemy hit");
                     }
                 }
                 isAttackRunningL = false;
+                //disparition hammerHitBox
+                hammerPointL.SetActive(false);
             }
 
 
             //Droite
             if (!attackDirection && Input.GetKey(attackKey) && Time.time >= nextAttackTime)
             {
-                Debug.Log("OUI1D");
                 isAttackRunningR = true;
                 attackDurationActu = attackDuration + Time.time;
+
+                //apparition hammerHitBox
+                hammerPointR.SetActive(true);
             }
 
             if (isAttackRunningR && Time.time >= attackDurationActu)
             {
-                Debug.Log("OUI2D");
                 //reset timeAttack
                 nextAttackTime = Time.time + 1f / attackRate;
 
                 //Animation / Attack hitbox Apparition (pour test)
 
                 //Detection d'un blocage
-                Collider2D[] hammers = Physics2D.OverlapCircleAll(hammerPointR.position, hammerHitboxRange, hammerHitboxLayer);
-                if (hammers.Length > 0)
+                Collider2D[] hammers = Physics2D.OverlapCircleAll(hammerPointR.transform.position, hammerHitboxRange, hammerHitboxLayer);
+                if (hammers.Length > 1)
                 {
                     //on contre
                     Debug.Log("Blocage à Droite");
@@ -244,12 +251,13 @@ public class PlayerController : MonoBehaviour
                         //Appliquer une velocité
                         //Attention: check la direction pour coord x
                         enemy.GetComponent<PlayerController>().applyAttack(hammerProjection, 0);
-                        Debug.Log("Attaque à Droite");
-
-                        Debug.Log("Enemy hit");
+                        //Debug.Log("Attaque à Droite");
+                        //Debug.Log("Enemy hit");
                     }
                 }
                 isAttackRunningR = false;
+                //disparition hammerHitBox
+                hammerPointR.SetActive(false);
             }
             
 
@@ -336,24 +344,12 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector2(velocityX, velocityY);
     }
 
-    bool isAttackingL()
-    {
-        if (isAttackRunningL) return true;
-        return false;
-    }
-
-    bool isAttackingR()
-    {
-        if (isAttackRunningR) return true;
-        return false;
-    }
-
     void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(attackPointR.position, attackRange);
         Gizmos.DrawWireSphere(attackPointL.position, attackRange);
-        Gizmos.DrawWireSphere(hammerPointL.position, hammerHitboxRange);
-        Gizmos.DrawWireSphere(hammerPointR.position, hammerHitboxRange);
+        Gizmos.DrawWireSphere(hammerPointL.transform.position, hammerHitboxRange);
+        Gizmos.DrawWireSphere(hammerPointR.transform.position, hammerHitboxRange);
     }
 
     void OnCollisionStay2D(Collision2D col)
