@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (Input.GetKeyDown(jumpKey) && isGrippingRight && !isAttackRunningL && !isAttackRunningR)
             {
-                //jump to the left w/ 45° angle
+                //jump to the left w/ 45ï¿½ angle
                 rb.velocity = new Vector2(-wallJumpSpeed, jumpSpeed / (Mathf.Sqrt(2) / 2));
                 jumpState = JumpState.InFlight;
                 startJumpPosition = transform.position.y;
@@ -134,7 +134,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (Input.GetKeyDown(jumpKey) && isGrippingLeft && !isAttackRunningL && !isAttackRunningR)
             {
-                //jump to the right w/ 45° angle
+                //jump to the right w/ 45ï¿½ angle
                 rb.velocity = new Vector2(wallJumpSpeed, jumpSpeed / (Mathf.Sqrt(2) / 2));
                 jumpState = JumpState.InFlight;
                 startJumpPosition = transform.position.y;
@@ -195,7 +195,7 @@ public class PlayerController : MonoBehaviour
                 if (hammers.Length > 1)
                 {
                     //on contre
-                    Debug.Log("Blocage à Gauche");
+                    Debug.Log("Blocage ï¿½ Gauche");
 
                     didAttackedBlockedL = true;
                     /*
@@ -216,10 +216,10 @@ public class PlayerController : MonoBehaviour
 
                 if (!didAttackedBlockedL)
                 {
-                    //On leur applique une velocité (effet de l'attaque)
+                    //On leur applique une velocitï¿½ (effet de l'attaque)
                     foreach (Collider2D enemy in hitEnemies)
                     {
-                        //Appliquer une velocité
+                        //Appliquer une velocitï¿½
                         //Attention: check la direction pour coord x
                         enemy.GetComponent<PlayerController>().applyAttack(-hammerProjection, 0);
                     }
@@ -259,7 +259,7 @@ public class PlayerController : MonoBehaviour
                 if (hammers.Length > 1)
                 {
                     //on contre
-                    Debug.Log("Blocage à Droite");
+                    Debug.Log("Blocage ï¿½ Droite");
                     didAttackedBlockedR = true;
                 }
             }
@@ -277,13 +277,13 @@ public class PlayerController : MonoBehaviour
 
                 if (!didAttackedBlockedR)
                 {
-                    //On leur applique une velocité (effet de l'attaque)
+                    //On leur applique une velocitï¿½ (effet de l'attaque)
                     foreach (Collider2D enemy in hitEnemies)
                     {
-                        //Appliquer une velocité
+                        //Appliquer une velocitï¿½
                         //Attention: check la direction pour coord x
                         enemy.GetComponent<PlayerController>().applyAttack(hammerProjection, 0);
-                        //Debug.Log("Attaque à Droite");
+                        //Debug.Log("Attaque ï¿½ Droite");
                         //Debug.Log("Enemy hit");
                     }
                 }
@@ -306,7 +306,7 @@ public class PlayerController : MonoBehaviour
         //Stun
         stunTimeActu = stunTime + Time.time;
 
-        //Velocité
+        //Velocitï¿½
         rb.velocity = new Vector2(velocityX, velocityY);
     }
 
@@ -320,8 +320,8 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionStay2D(Collision2D col)
     {
-        //Exception anti "grip" sur le coté des plateforme
-        //Bug: Le grip ne s'effectue pas au niveau des pieds. Solution : Changer la HitBox (à faire après changement du sprite et animations)
+        //Exception anti "grip" sur le cotï¿½ des plateforme
+        //Bug: Le grip ne s'effectue pas au niveau des pieds. Solution : Changer la HitBox (ï¿½ faire aprï¿½s changement du sprite et animations)
         if (jumpState == JumpState.InFlight && col.gameObject.tag == "Plateform" && 
             col.gameObject.transform.position.x <= transform.position.x && col.gameObject.transform.position.y >= transform.position.y - hight)
         {

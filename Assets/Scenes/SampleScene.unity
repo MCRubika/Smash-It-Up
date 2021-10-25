@@ -852,8 +852,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
-      propertyPath: gripCheckL2
-      value: 
+      propertyPath: attackKey
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 3812759482883892321, guid: 9e2acb22dc8f90148aad580c143b5c93, type: 3}
       propertyPath: gripCheckL3
